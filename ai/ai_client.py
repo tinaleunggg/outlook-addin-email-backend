@@ -13,7 +13,7 @@ AOAI_KEY = os.getenv("AOAI_KEY")
 DEPLOYMENT = os.getenv("DEPLOYMENT")
 
 
-def call_azure_openai(prompt, response_format=None, temperature=0):
+async def call_azure_openai(prompt, client=None, response_format=None, temperature=0):
     """Generic helper to call Azure OpenAI Chat Completion"""
     payload = {
         "messages": [{"role": "user", "content": prompt}],
@@ -23,7 +23,7 @@ def call_azure_openai(prompt, response_format=None, temperature=0):
         payload["response_format"] = response_format
 
     url = f"{AOAI_ENDPOINT}/openai/deployments/{DEPLOYMENT}/chat/completions?api-version=2024-12-01-preview"
-    r = requests.post(url, headers={"api-key": AOAI_KEY, "Content-Type": "application/json"}, json=payload)
+    r = await client.post(url, headers={"api-key": AOAI_KEY, "Content-Type": "application/json"}, json=payload)
 
     if r.status_code != 200:
         print("Azure OpenAI Error:", r.status_code, r.text)

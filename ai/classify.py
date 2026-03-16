@@ -1,5 +1,5 @@
 from .ai_client import call_azure_openai
-import json, re, requests
+import json, re
 
 CATEGORIES = {
     "Tenant Emails": [
@@ -66,7 +66,7 @@ CATEGORIES = {
         "Subscription or account notifications"
     ]
 }
-def classify_email(subject, body):
+async def classify_email(subject:str , body:str , client):
     categories_text = "\n".join([f"- {k}: {', '.join(v)}" for k,v in CATEGORIES.items()])
     
     prompt = f"""
@@ -90,7 +90,7 @@ def classify_email(subject, body):
       "copilot_action": "<suggested action>"
     }}
     """
-    raw = call_azure_openai(prompt)
+    raw = await call_azure_openai(prompt, client=client)
 
 
     # Try to safely extract JSON

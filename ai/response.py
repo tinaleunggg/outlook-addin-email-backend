@@ -1,6 +1,6 @@
 from .ai_client import call_azure_openai
 
-def generate_draft(subject, body, analysis):
+async def generate_draft(subject, body, analysis, client):
     summary = analysis.get("summary", "")
     intent = analysis.get("intent", "")
     action = analysis.get("copilot_action", "")
@@ -20,4 +20,4 @@ def generate_draft(subject, body, analysis):
     Reply ONLY with the draft email text.
     Do NOT include any HTML tags. The reply must be plain text only.
     """
-    return call_azure_openai(prompt)
+    return await call_azure_openai(prompt, client=client)

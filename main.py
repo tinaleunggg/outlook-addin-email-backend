@@ -1,16 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-# from openai import AzureOpenAI
-# from langchain.vectorstores import Chroma
-# from langchain.embeddings.openai import OpenAIEmbeddings
-import os
+# import os
 from pydantic import BaseModel
-
-from email_cleaner import clean_emails
-
+# from email_cleaner import clean_emails
 from ai.classify import classify_email
 from ai.analyze import summarize_email
 from ai.response import generate_draft
+import httpx
+import asyncio
 
 app = FastAPI()
 
@@ -31,36 +28,19 @@ class EmailData(BaseModel):
     subject: str
     body: str
 
-
-# # Initialize Azure OpenAI
-# azure_client = AzureOpenAI(
-#     api_key=os.getenv("AZURE_OPENAI_KEY"),
-#     api_version="2024-02-01",
-#     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
-# )
-
-# # Initialize vector store for RAG
-# embeddings = OpenAIEmbeddings(
-#     deployment="text-embedding-ada-002",
-#     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
-#     openai_api_base=os.getenv("AZURE_OPENAI_ENDPOINT"),
-#     openai_api_type="azure"
-# )
-# vectorstore = Chroma(
-#     persist_directory="./chroma_db",
-#     embedding_function=embeddings
-# )
-
 @app.post("/api/analyze")
 async def analyze_email(data: EmailData):
     email_body = data.body
     email_subject = data.subject
     
     try:
-        classification = classify_email(email_subject, email_body)
-        analysis = summarize_email(email_subject, email_body)
-        draft = generate_draft(email_subject, email_body, analysis)
-    
+        async with httpx.AsyncClient() as client:
+            classification, analysis = await asyncio.gather(
+                classify_email(email_subject, email_body, client), 
+                summarize_email(email_subject, email_body, client)
+                )
+            draft = await generate_draft(email_subject, email_body, analysis, client)
+        
         return {
             "subject": email_subject,
             "body_clean": email_body,
@@ -75,9 +55,7 @@ async def analyze_email(data: EmailData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="localhost", port=5000, ssl_keyfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.key", ssl_certfile=r"C:\\Users\\tinel\\.office-addin-dev-certs\\localhost.crt")
+    uvicorn.run("main:app", host="localhost", port=5000, ssl_keyfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.key", ssl_certfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.crt")
     

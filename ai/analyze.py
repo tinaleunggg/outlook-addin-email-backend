@@ -2,7 +2,7 @@ from .ai_client import call_azure_openai
 import json
 import requests
 
-def summarize_email(subject, body, classification=None):
+async def summarize_email(subject, body, client, classification=None):
     """
     Generates a summary and identifies the sender's intent.
     """
@@ -31,7 +31,7 @@ def summarize_email(subject, body, classification=None):
       "copilot_action": "<recommended action>"
     }}
     """
-    raw = call_azure_openai(prompt, response_format={"type": "json_object"})
+    raw = await call_azure_openai(prompt, client=client, response_format={"type": "json_object"})
     try:
         return json.loads(raw)
     except:
