@@ -14,11 +14,7 @@ app = FastAPI()
 # Enable CORS for your add-in
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost:3000",
-        "http://localhost:3000",
-        "https://127.0.0.1:3000",
-        "http://127.0.0.1:3000",
-                    ],  # Your add-in URL
+    allow_origins=["*"],  # Your add-in URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,7 +51,8 @@ async def analyze_email(data: EmailData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="localhost", port=5000, ssl_keyfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.key", ssl_certfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.crt")
+# for development use
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run("main:app", host="localhost", port=5000, ssl_keyfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.key", ssl_certfile=r"C:\\Users\\tinal\\.office-addin-dev-certs\\localhost.crt")
     
