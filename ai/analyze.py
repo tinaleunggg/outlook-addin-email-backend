@@ -1,6 +1,5 @@
 from .ai_client import call_azure_openai
 import json
-import requests
 
 async def summarize_email(subject, body, client, classification=None):
     """

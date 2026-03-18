@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-# import os
 from pydantic import BaseModel
-# from email_cleaner import clean_emails
 from ai.classify import classify_email
 from ai.analyze import summarize_email
 from ai.response import generate_draft
@@ -23,6 +21,11 @@ app.add_middleware(
 class EmailData(BaseModel):
     subject: str
     body: str
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello from outlook add-in"}
 
 @app.post("/api/analyze")
 async def analyze_email(data: EmailData):

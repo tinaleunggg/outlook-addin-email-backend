@@ -1,4 +1,4 @@
-import os, requests, json
+import os, json
 from pathlib import Path
 from dotenv import load_dotenv
 # Get the directory where this file is located
